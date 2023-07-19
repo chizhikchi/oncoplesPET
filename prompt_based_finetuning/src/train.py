@@ -55,8 +55,8 @@ def train(config):
     :return:
     '''
 
-    #tokenizer = AutoTokenizer.from_pretrained(config.pretrained_weight)
-    tokenizer = BertTokenizer.from_pretrained(config.pretrained_weight)
+    tokenizer = AutoTokenizer.from_pretrained(config.pretrained_weight)
+    # tokenizer = BertTokenizer.from_pretrained(config.pretrained_weight)
     batcher = Batcher(config, tokenizer, config.dataset)
     dataset_reader = batcher.get_dataset_reader()
     model = adapet(config, tokenizer, dataset_reader).to(device)
@@ -78,10 +78,10 @@ def train(config):
     train_iter = batcher.get_train_batch()
     dict_val_store = None
 
-    # Number of batches is assuming grad_accumulation_factor forms one batch
+    # # Number of batches is assuming grad_accumulation_factor forms one batch
     tot_num_batches = config.num_batches * config.grad_accumulation_factor
 
-    # Warmup steps and total steps are based on batches, not epochs
+    # # Warmup steps and total steps are based on batches, not epochs
     num_warmup_steps = config.num_batches * config.warmup_ratio
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps, config.num_batches)
 

@@ -67,8 +67,11 @@ class adapet(torch.nn.Module):
 
         # Get ids for lbls
         lbl_ids = np.ones((self.num_lbl, self.config.max_num_lbl_tok)) * self.tokenizer.pad_token_id
+        print(list_lbl)
         for i, lbl in enumerate(list_lbl):
             i_lbl_ids = self.tokenizer(lbl, add_special_tokens=False)["input_ids"]
+            print(lbl)
+            print(i_lbl_ids)
             lbl_ids[i, :len(i_lbl_ids)] = i_lbl_ids
         lbl_ids = torch.tensor(lbl_ids).to(device).long()  # [num_lbl, max_num_lbl_tok]
 

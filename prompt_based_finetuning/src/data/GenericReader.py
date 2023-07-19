@@ -3,6 +3,7 @@ import json
 import random
 import itertools
 import numpy as np
+import pandas as pd
 import torch
 from collections import defaultdict
 
@@ -29,7 +30,7 @@ class GenericReader(object):
         self.pattern = self.config.pattern.split(txt_idx_trim)
         self.pattern.insert(1, txt_idx_trim)
 
-        self.label = list(self.config.dict_verbalizer.values())
+        self.label = list(self.config.dict_verbalizer.keys()) # change this to values to respore original
 
         self.list_true_lbl = []
 
@@ -63,11 +64,11 @@ class GenericReader(object):
         :return:
         '''
         if split.lower() == "train":
-            file = os.path.join(self.config.data_dir, "train.jsonl")
+            file = os.path.join(self.config.data_dir, "train.tsv")
         elif split.lower() == "dev":
-            file = os.path.join(self.config.data_dir, "val.jsonl")
+            file = os.path.join(self.config.data_dir, "val.tsv")
         elif split.lower() == "test":
-            file = os.path.join(self.config.data_dir, "test.jsonl")
+            file = os.path.join(self.config.data_dir, "test.tsv")
         return file
 
     def get_num_lbl_tok(self):
@@ -84,25 +85,21 @@ class GenericReader(object):
         file = self._get_file(split)
 
         data = []
+        df = pd.read_csv(file, sep='\t', index_col=0)
+        reports = df.report.to_list()
+        labels = df.label.to_list()
+        for i, (report, label) in enumerate(zip(reports, labels)):
+            dict_input = {}
+            dict_input["idx"] = i
+            for j in range(1, self.text_ctr):
+                dict_input["TEXT%d" % j] = report
+            dict_output = {}
 
-        with open(file, 'r') as f_in:
-            for i, line in enumerate(f_in.readlines()):
-                json_string = json.loads(line)
-
-                dict_input = {}
-                dict_input["idx"] = i
-                for j in range(1, self.text_ctr):
-                    dict_input["TEXT%d" % j] = json_string["TEXT%d" % j]
-
-                dict_output = {}
-                if "LBL" not in json_string:
-                    raise ValueError("LBL not in json")
-
-                if json_string["LBL"] not in self.config.dict_verbalizer:
-                    raise ValueError("Label %s not in dictionary verbalizer" % json_string["LBL"])
-                dict_output["lbl"] = list(self.config.dict_verbalizer.keys()).index(json_string["LBL"])
-                dict_input_output = {"input": dict_input, "output": dict_output}
-                data.append(dict_input_output)
+            if str(label) not in self.config.dict_verbalizer:
+                raise ValueError("Label %s not in dictionary verbalizer" % str(label))
+            dict_output["lbl"] = list(self.config.dict_verbalizer.keys()).index(str(label))
+            dict_input_output = {"input": dict_input, "output": dict_output}
+            data.append(dict_input_output)
         return data
 
     @property

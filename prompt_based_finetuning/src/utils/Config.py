@@ -7,13 +7,13 @@ from src.utils.util import make_exp_dir
 class Config(object):
     def __init__(self, filename=None, kwargs=None, mkdir=True):
         # Dataset parameters
-        self.dataset = "fewglue/BoolQ"
+        self.dataset = "ONCOPLES/Data/nirads"
         self.num_lbl = 2
         self.max_num_lbl_tok = 10
         self.max_num_lbl = 10
 
         # Model and pattern parameters
-        self.pretrained_weight = "bert-base-uncased"
+        self.pretrained_weight = "./Models/roberta-base-biomedical-clinical-es"
         self.pattern_idx = "random"
 
         # Duration of training parameters
@@ -32,7 +32,7 @@ class Config(object):
         # Where experiments will be located
         self.exp_dir = None
         self.seed = 42
-        self.exp_name = ""
+        self.exp_name = "robertaADAPET"
 
         # Training Hyperparameters
         self.lr = 1e-3
@@ -41,10 +41,14 @@ class Config(object):
         self.warmup_ratio = 0
 
         # Generic dataset hyperparameters
-        self.pattern = "[TEXT1] and [TEXT2] "
+        self.pattern = '[TEXT1] [SEP] Código NI-RADS [LBL]'
         self.idx_txt_trim = -1 # Indexed from 1
-        self.dict_verbalizer = {"True": "Yes", "False": "No"}
-        self.data_dir = "data/fewglue/BoolQ"
+        self.dict_verbalizer = {"0": "NI-RADS 0", "1": "NI-RADS 1", 
+                                "2": "NI-RADS-2", "3": "NI-RADS-2A",
+                                "4": "NI-RADS-2B", "5": "NI-RADS-3", 
+                                "6": "NI-RADS-4"}
+        
+        self.data_dir = "./ONCOPLES/data/nirads"
 
         if filename:
             self.__dict__.update(json.load(open(filename)))

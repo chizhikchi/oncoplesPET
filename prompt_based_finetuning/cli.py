@@ -16,7 +16,7 @@ if __name__ == '__main__':
     parser.add_argument('-v', "--dict_verbalizer", type=json.loads, default=None, help="Dictionary mapping label name (in dataset) to the verbalizer to use, e.g. '{\"0\": \"Yes\", \"1\": \"No\"}'")
 
     # Model and training hyperparams
-    parser.add_argument('-w', '--pretrained_weight', type=str, default='albert-xxlarge-v2', help='Pretrained model weights from huggingface')
+    parser.add_argument('-w', '--pretrained_weight', type=str, default='./Models/roberta-base-biomedical-clinical-es', help='Pretrained model weights from huggingface')
     parser.add_argument('-bs', '--batch_size', type=int, default=1, help='batch size during training')
     parser.add_argument('--eval_batch_size', type=int, default=1, help='batch size during evaluation')
     parser.add_argument('--grad_accumulation_factor', type=int, default=16, help='number of gradient accumulation steps')
@@ -47,8 +47,9 @@ if __name__ == '__main__':
         use_config = args.config
     else:
         assert args.data_dir or args.pattern or args.dict_verbalizer, 'Please enter all of data_dir, pattern, dict_verbalizer if not providing config!'
-        use_config = os.path.join("config", "Generic.json")
+        use_config = os.path.join("oncoplesPET/prompt_based_finetuning/config", "Generic.json")
 
     update_config = vars(args)
     config = Config(use_config, update_config, mkdir=True)
     train(config)
+
